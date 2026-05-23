@@ -4,437 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Challenge Tracker</title>
-<link href="./30-Day Challenge Tracker_files/css2" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --amber: #c8921a;
-    --amber-light: #e8b040;
-    --amber-dim: #a87518;
-    --amber-pale: #fff9ee;
-    --amber-border: #f0c878;
-    --sage: #3a8a58;
-    --sage-light: #5aaa72;
-    --sage-dim: #2a6a42;
-    --bg: #f3f1ec;
-    --card: #ffffff;
-    --border: #e4ddd0;
-    --border-soft: #ede8df;
-    --text: #1e1a14;
-    --text-2: #6b5c44;
-    --text-3: #a89070;
-    --shadow: 0 4px 32px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
-    --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
-  }
-
-  html, body {
-    height: 100%;
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Jost', sans-serif;
-    font-weight: 300;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 1rem;
-  }
-
-  #app {
-    background: var(--card);
-    border-radius: 28px;
-    box-shadow: var(--shadow);
-    width: 100%;
-    max-width: 420px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2rem 1.5rem 2rem;
-  }
-
-  #top-bar {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-  }
-
-  #cal-btn {
-    background: var(--bg);
-    border-radius: 20px;
-    font-family: 'Jost', sans-serif;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 7px 16px;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: 1px solid var(--border);
-    color: var(--text-2);
-  }
-  #cal-btn:hover { border-color: var(--amber-border); color: var(--amber); background: var(--amber-pale); }
-
-  #day-label {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 15px;
-    font-weight: 400;
-    color: var(--text-2);
-    letter-spacing: 0.04em;
-  }
-
-  /* RING */
-  #ring-wrap { position: relative; width: 260px; height: 260px; margin-bottom: 2rem; }
-  #ring-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-  #progress-ring { transition: stroke-dashoffset 0.6s cubic-bezier(0.4,0,0.2,1); }
-
-  #time-center {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    width: 170px;
-  }
-  #time-display {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 46px;
-    font-weight: 400;
-    color: var(--text);
-    letter-spacing: -0.02em;
-    line-height: 1;
-  }
-  #active-type-label {
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    margin-top: 7px;
-    min-height: 14px;
-    color: var(--amber-dim);
-  }
-  #time-sub {
-    font-size: 10px;
-    font-weight: 400;
-    color: var(--text-3);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-top: 4px;
-  }
-  #pct-label {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 18px;
-    margin-top: 6px;
-    letter-spacing: 0.04em;
-    color: var(--amber-dim);
-  }
-
-  /* START/STOP */
-  #start-stop {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 140px; height: 48px;
-    border-radius: 30px;
-    background: none;
-    font-family: 'Jost', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-bottom: 2rem;
-    border: 1.5px solid var(--border);
-    color: var(--text-2);
-  }
-  #start-stop:hover { border-color: var(--amber-border); color: var(--amber); background: var(--amber-pale); }
-  #start-stop.running { border-color: var(--amber); color: var(--amber-dim); background: var(--amber-pale); }
-
-  #dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: var(--text-3);
-    flex-shrink: 0;
-    transition: background 0.2s;
-  }
-  #dot.live { background: var(--amber); animation: pulse 1.5s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
-  /* SUMMARY */
-  #summary {
-    width: 100%;
-    border-top: 1px solid var(--border-soft);
-    padding-top: 1.4rem;
-    display: flex;
-  }
-  .sum-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    padding: 0 0.5rem;
-  }
-  .sum-item + .sum-item { border-left: 1px solid var(--border-soft); }
-  .sum-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; color: var(--amber-dim); }
-  .sum-label-neutral { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; color: var(--text-3); }
-  .sum-time { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; line-height: 1; color: var(--amber); }
-  .sum-neutral { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; line-height: 1; color: var(--text-2); }
-  .sum-bar-wrap { width: 80%; height: 3px; background: var(--border-soft); border-radius: 2px; overflow: hidden; }
-  .sum-bar-amber { height: 100%; border-radius: 2px; transition: width 0.6s ease; background: linear-gradient(90deg, var(--amber-dim), var(--amber-light)); }
-  .sum-bar-neutral { height: 100%; border-radius: 2px; transition: width 0.6s ease; background: linear-gradient(90deg, #b0a090, #c8b8a0); }
-
-  /* STREAK */
-  #streak-section {
-    width: 100%;
-    border-top: 1px solid var(--border-soft);
-    margin-top: 1.4rem;
-    padding-top: 1.2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  #streak-left { display: flex; flex-direction: column; gap: 3px; }
-  #streak-label { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); }
-  #streak-count { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 400; color: var(--sage); line-height: 1; }
-  #streak-since { font-size: 10px; color: var(--text-3); letter-spacing: 0.05em; margin-top: 2px; }
-  #streak-reset {
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    font-family: 'Jost', sans-serif;
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-3);
-    padding: 5px 13px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  #streak-reset:hover { border-color: #e08080; color: #c05050; background: #fff5f5; }
-
-  /* OVERLAY */
-  #overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(243, 241, 236, 0.97);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    z-index: 100;
-    flex-direction: column;
-    align-items: center;
-    padding: 2rem 1.5rem;
-    overflow-y: auto;
-  }
-  #overlay.open { display: flex; }
-  #overlay-inner { width: 100%; max-width: 480px; }
-
-  #cal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.4rem;
-  }
-  #cal-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 22px;
-    font-weight: 400;
-    color: var(--text);
-    letter-spacing: 0.04em;
-  }
-  #close-btn {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    color: var(--text-2);
-    font-size: 14px;
-    width: 34px; height: 34px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    box-shadow: var(--shadow-sm);
-  }
-  #close-btn:hover { color: var(--text); background: var(--bg); }
-
-  /* STREAK TAB */
-  .streak-summary {
-    background: var(--card);
-    border-radius: 14px;
-    padding: 1rem 1.2rem;
-    border: 1px solid var(--border-soft);
-    box-shadow: var(--shadow-sm);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-  .streak-big { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 400; color: var(--sage); line-height: 1; }
-  .streak-meta { font-size: 10px; color: var(--text-3); letter-spacing: 0.06em; margin-top: 4px; }
-  .streak-resets-badge { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--text-2); line-height: 1; text-align: right; }
-  .streak-resets-lbl { font-size: 9px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); margin-top: 4px; text-align: right; }
-  .streak-history-title { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); margin-bottom: 0.7rem; }
-  .reset-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.55rem 0;
-    border-bottom: 1px solid var(--border-soft);
-    font-size: 13px;
-    color: var(--text-2);
-  }
-  .reset-row:last-child { border-bottom: none; }
-  .reset-num { font-size: 10px; color: var(--text-3); letter-spacing: 0.06em; }
-  .streak-reset-btn-overlay {
-    margin-top: 1.2rem;
-    width: 100%;
-    padding: 10px;
-    border-radius: 22px;
-    border: 1.5px solid var(--border);
-    background: none;
-    font-family: 'Jost', sans-serif;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-3);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .streak-reset-btn-overlay:hover { border-color: #e08080; color: #c05050; background: #fff5f5; }
-
-  /* TABS */
-  #overlay-tabs {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 1.4rem;
-    background: var(--card);
-    border-radius: 28px;
-    padding: 4px;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border);
-    width: fit-content;
-  }
-  .tab-btn {
-    padding: 7px 18px;
-    border-radius: 22px;
-    border: none;
-    background: none;
-    font-family: 'Jost', sans-serif;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    cursor: pointer;
-    color: var(--text-3);
-    transition: all 0.2s;
-  }
-  .tab-btn.active { background: var(--bg); color: var(--text); box-shadow: var(--shadow-sm); }
-
-  .tab-content { display: none; }
-  .tab-content.visible { display: block; }
-
-  /* LEGEND */
-  .legend { display: flex; gap: 16px; margin-bottom: 1rem; flex-wrap: wrap; }
-  .leg-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-2); letter-spacing: 0.05em; }
-  .leg-dot { width: 8px; height: 8px; border-radius: 2px; }
-  .leg-dot.study { background: var(--amber); }
-  .leg-dot.sabr { background: var(--sage); }
-
-  /* 7-DAY CALENDAR STRIP */
-  #cal-7d {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
-    margin-bottom: 1.2rem;
-  }
-
-  /* 30-DAY CALENDAR GRID */
-  #cal-30d { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-
-  .dn { font-size: 10px; color: var(--text-3); text-align: center; padding-bottom: 6px; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 500; }
-
-  .cal-day {
-    border-radius: 8px;
-    border: 1px solid var(--border-soft);
-    background: var(--card);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 4px 2px;
-    gap: 1px;
-    min-height: 56px;
-  }
-  .cal-day.empty { border: none; background: none; }
-  .cal-day.future { opacity: 0.25; }
-  .cal-day.today { border-color: var(--border); box-shadow: var(--shadow-sm); }
-  .cal-day.done-day { background: var(--amber-pale); border-color: var(--amber-border); }
-  .cal-day.today.done-day { border-color: var(--amber); }
-
-  .cd-month { font-size: 7px; color: var(--text-3); line-height: 1; font-weight: 400; text-transform: uppercase; letter-spacing: 0.04em; }
-  .cd-num { font-size: 9px; color: var(--text-3); line-height: 1; font-weight: 500; }
-  .cal-day.today .cd-num { color: var(--amber-dim); font-weight: 600; }
-  .cd-total { font-family: 'Cormorant Garamond', serif; font-size: 13px; color: var(--text-2); line-height: 1; margin-top: 1px; }
-  .cal-day.done-day .cd-total { color: var(--amber-dim); }
-  .cd-split { display: flex; flex-direction: column; gap: 1px; width: 100%; align-items: center; }
-  .cd-type { font-size: 7.5px; letter-spacing: 0.03em; line-height: 1.3; font-weight: 500; }
-  .cd-type.s { color: var(--amber-dim); }
-  .cd-type.r { color: var(--sage-dim); }
-  .cd-check { font-size: 10px; color: var(--amber); line-height: 1; }
-
-  /* STATS */
-  .stats-row { display: flex; gap: 8px; margin-bottom: 1rem; }
-  .stat-card {
-    flex: 1;
-    background: var(--card);
-    border-radius: 12px;
-    padding: 0.8rem 0.4rem;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-soft);
-    text-align: center;
-  }
-  .stat-val { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 400; line-height: 1; }
-  .stat-val.study { color: var(--amber); }
-  .stat-val.sabr { color: var(--sage); }
-  .stat-val.total { color: var(--text); }
-  .stat-val.days { color: var(--text-2); }
-  .stat-lbl { font-size: 8px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); margin-top: 4px; }
-
-  .chart-section {
-    background: var(--card);
-    border-radius: 16px;
-    padding: 1.2rem 1rem 1rem;
-    margin-bottom: 1rem;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-soft);
-  }
-  .chart-title {
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-3);
-    margin-bottom: 1rem;
-  }
-  .donut-wrap { display: flex; justify-content: center; padding: 0.5rem 0; }
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div id="app">
   <div id="top-bar">
     <button id="cal-btn" onclick="openCal()">Log</button>
-    <span id="day-label">Day 1 of 7</span>
+    <span id="day-label" style="flex:1;text-align:center"></span>
+    <button id="challenge-btn" onclick="openChallenge()">Goal</button>
   </div>
 
   <div id="ring-wrap">
@@ -459,6 +37,8 @@
       <div id="pct-label">0%</div>
     </div>
   </div>
+
+  <div id="cat-selector"></div>
 
   <button id="start-stop" onclick="toggleTimer()">
     <span id="dot"></span>
@@ -488,6 +68,7 @@
   </div>
 </div>
 
+<!-- LOG OVERLAY -->
 <div id="overlay">
   <div id="overlay-inner">
     <div id="cal-header">
@@ -496,40 +77,26 @@
     </div>
 
     <div id="overlay-tabs">
-      <button class="tab-btn active" id="tab-7d-btn" onclick="switchTab('7d')">7-Day</button>
-      <button class="tab-btn" id="tab-30d-btn" onclick="switchTab('30d')">30-Day</button>
-      <button class="tab-btn" id="tab-alltime-btn" onclick="switchTab('alltime')">All Time</button>
+      <button class="tab-btn active" id="tab-monthly-btn" onclick="switchTab('monthly')">Calendar</button>
+      <button class="tab-btn" id="tab-alltime-btn" onclick="switchTab('alltime')">History</button>
       <button class="tab-btn" id="tab-streak-btn" onclick="switchTab('streak')">Streak</button>
     </div>
 
-    <!-- 7-DAY TAB -->
-    <div id="tab-7d" class="tab-content visible">
-      <div class="stats-row" id="stats-7d"></div>
-      <div id="cal-7d"></div>
-      <div class="chart-section">
-        <div class="chart-title">Daily Hours — 7-Day Challenge</div>
-        <div style="position:relative; height:160px;">
-          <canvas id="chart-7d"></canvas>
+    <!-- CALENDAR TAB -->
+    <div id="tab-monthly" class="tab-content visible">
+      <div id="month-nav">
+        <button class="month-nav-btn" onclick="prevMonth()">‹</button>
+        <span id="monthly-title"></span>
+        <button class="month-nav-btn" onclick="nextMonth()">›</button>
+      </div>
+      <div class="stats-row" id="stats-monthly"></div>
+      <div id="cal-monthly"></div>
+      <div class="chart-section" style="margin-top:1rem">
+        <div class="chart-title" id="chart-monthly-title"></div>
+        <div style="position:relative; height:180px;">
+          <canvas id="chart-monthly"></canvas>
         </div>
       </div>
-      <div class="chart-section">
-        <div class="chart-title">Today's Progress</div>
-        <div class="donut-wrap">
-          <div style="position:relative; width:200px; height:200px;">
-            <canvas id="chart-donut"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 30-DAY TAB (historical) -->
-    <div id="tab-30d" class="tab-content">
-      <div class="legend">
-        <div class="leg-item"><div class="leg-dot study"></div>Studying</div>
-        <div class="leg-item"><div class="leg-dot sabr"></div>SABR (historical)</div>
-      </div>
-      <div class="stats-row" id="stats-30d"></div>
-      <div id="cal-30d"></div>
     </div>
 
     <!-- STREAK TAB -->
@@ -562,593 +129,98 @@
   </div>
 </div>
 
+<!-- CATEGORY MODAL -->
+<div id="cat-modal">
+  <div id="cat-modal-inner">
+    <div class="cat-modal-title">Categories</div>
+    <div id="cat-list"></div>
+    <hr class="cat-divider">
+    <div class="ch-field">
+      <label class="ch-label">New Category Name</label>
+      <input type="text" id="cat-name-input" class="ch-input" placeholder="e.g. Reading" maxlength="30">
+    </div>
+    <div class="ch-label" style="margin-bottom:0.45rem">Colour</div>
+    <div class="cat-color-row" id="cat-color-row"></div>
+    <div class="cat-modal-btns">
+      <button class="cat-modal-cancel" onclick="closeCatModal()">Close</button>
+      <button class="cat-modal-save" onclick="addCategory()">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHALLENGE OVERLAY -->
+<div id="challenge-overlay">
+  <div id="challenge-inner">
+    <div id="ch-header">
+      <span id="ch-title">Challenge</span>
+      <button id="ch-close-btn" onclick="closeChallenge()">✕</button>
+    </div>
+
+    <!-- Active challenge -->
+    <div id="ch-active-view" style="display:none">
+      <div class="ch-card">
+        <div class="ch-card-name" id="ch-card-name"></div>
+        <div class="ch-stats-row">
+          <div class="ch-stat"><div class="ch-stat-val" id="ch-stat-day"></div><div class="ch-stat-lbl">Day</div></div>
+          <div class="ch-stat"><div class="ch-stat-val" id="ch-stat-left"></div><div class="ch-stat-lbl">Days Left</div></div>
+          <div class="ch-stat"><div class="ch-stat-val" id="ch-stat-goal"></div><div class="ch-stat-lbl">Daily Goal</div></div>
+          <div class="ch-stat"><div class="ch-stat-val" id="ch-stat-done"></div><div class="ch-stat-lbl">Done</div></div>
+        </div>
+        <div class="ch-days-grid" id="ch-days-grid"></div>
+      </div>
+      <div class="chart-section" style="margin-top:1rem">
+        <div class="chart-title" id="ch-chart-title">Daily Hours</div>
+        <div style="position:relative; height:160px;">
+          <canvas id="chart-challenge"></canvas>
+        </div>
+      </div>
+      <button class="ch-end-btn" onclick="endChallenge()">End Challenge Early</button>
+    </div>
+
+    <!-- Complete state -->
+    <div id="ch-complete-view" style="display:none">
+      <div class="ch-card">
+        <div class="ch-complete-banner">Complete!</div>
+        <div class="ch-card-name" id="ch-complete-name"></div>
+        <div class="ch-stats-row">
+          <div class="ch-stat"><div class="ch-stat-val" id="ch-complete-done"></div><div class="ch-stat-lbl">Days Met</div></div>
+          <div class="ch-stat"><div class="ch-stat-val" id="ch-complete-hours"></div><div class="ch-stat-lbl">Total Hours</div></div>
+        </div>
+      </div>
+      <button class="ch-start-btn" onclick="showChallengeForm()">New Challenge</button>
+    </div>
+
+    <!-- Form -->
+    <div id="ch-form-view">
+      <div class="ch-form-title">New Challenge</div>
+      <div class="ch-field">
+        <label class="ch-label">Name (optional)</label>
+        <input type="text" id="ch-name-input" class="ch-input" placeholder="e.g. 8-Day Sprint" maxlength="40">
+      </div>
+      <div class="ch-field">
+        <label class="ch-label">Duration</label>
+        <div class="ch-stepper">
+          <button class="ch-step" onclick="chAdj('days',-1)">−</button>
+          <span class="ch-stepper-val" id="ch-days-val">7</span>
+          <span class="ch-stepper-unit">days</span>
+          <button class="ch-step" onclick="chAdj('days',1)">+</button>
+        </div>
+      </div>
+      <div class="ch-field">
+        <label class="ch-label">Daily Goal</label>
+        <div class="ch-stepper">
+          <button class="ch-step" onclick="chAdj('goal',-1)">−</button>
+          <span class="ch-stepper-val" id="ch-goal-val">10</span>
+          <span class="ch-stepper-unit">hours</span>
+          <button class="ch-step" onclick="chAdj('goal',1)">+</button>
+        </div>
+      </div>
+      <button class="ch-start-btn" onclick="startChallenge()">Start Challenge</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script>
-  const GOAL   = 36000;   // 10 hours in seconds
-  const CIRC   = 666.02;
-  const DAYS_7  = 7;
-  const DAYS_30 = 30;
-  const START_7  = new Date(2026, 3, 29);  // April 29, 2026
-  const START_30 = new Date(2026, 2, 28);  // March 28, 2026
-
-  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-  let chart7d = null, donutChart = null, alltimeChart = null;
-
-  function dateKey(d) {
-    return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
-  }
-  function todayKey() { return dateKey(new Date()); }
-
-  function load() {
-    try {
-      const data = JSON.parse(localStorage.getItem('tc30_v3') || '{}');
-      const sess = data._session;
-      delete data._session;
-      return { data, sess };
-    } catch(e) { return { data: {}, sess: null }; }
-  }
-
-  function save() {
-    try {
-      const toSave = Object.assign({}, state);
-      if (sessionStart) toSave._session = { start: sessionStart, type: 'study' };
-      localStorage.setItem('tc30_v3', JSON.stringify(toSave));
-    } catch(e) {}
-  }
-
-  const _loaded = load();
-  let state = _loaded.data;
-  let sessionStart = null, ticker = null;
-
-  if (_loaded.sess) {
-    sessionStart = _loaded.sess.start;
-    ticker = setInterval(() => { updateUI(); save(); }, 1000);
-  }
-
-  function todayData() {
-    const k = todayKey();
-    if (!state[k]) state[k] = { total: 0, study: 0, sabr: 0 };
-    if (state[k].study == null) state[k].study = 0;
-    if (state[k].sabr  == null) state[k].sabr  = 0;
-    return state[k];
-  }
-
-  function liveStudySecs() {
-    const d = todayData();
-    return (d.study || 0) + (sessionStart ? Math.floor((Date.now()-sessionStart)/1000) : 0);
-  }
-
-  function getEntry(d) {
-    const k = dateKey(d);
-    const isToday = k === todayKey();
-    const raw = state[k] || { total: 0, study: 0, sabr: 0 };
-    if (isToday && sessionStart) {
-      const b = Math.floor((Date.now()-sessionStart)/1000);
-      return { total: (raw.total||0)+b, study: (raw.study||0)+b, sabr: raw.sabr||0 };
-    }
-    return { total: raw.total||0, study: raw.study||0, sabr: raw.sabr||0 };
-  }
-
-  function fmt(s) {
-    return Math.floor(s/3600) + 'h ' + String(Math.floor((s%3600)/60)).padStart(2,'0') + 'm';
-  }
-
-  function updateUI() {
-    const secs = liveStudySecs();
-    const pct  = Math.min(1, secs / GOAL);
-    document.getElementById('progress-ring').style.strokeDashoffset = CIRC * (1 - pct);
-    document.getElementById('time-display').textContent = fmt(secs);
-    document.getElementById('pct-label').textContent = Math.round(pct * 100) + '%';
-
-    // Day label for 7-day challenge
-    const todayMs = new Date(new Date().toDateString()).getTime();
-    const dayNum  = Math.floor((todayMs - START_7.getTime()) / 86400000) + 1;
-    if (dayNum >= 1 && dayNum <= DAYS_7) {
-      document.getElementById('day-label').textContent = 'Day ' + dayNum + ' of 7';
-    } else if (dayNum > DAYS_7) {
-      document.getElementById('day-label').textContent = 'Challenge Complete';
-    } else {
-      document.getElementById('day-label').textContent = '7-Day Challenge';
-    }
-
-    // Running state
-    const running = !!sessionStart;
-    const typeLbl = document.getElementById('active-type-label');
-    if (running) {
-      typeLbl.textContent = 'Studying';
-    } else {
-      typeLbl.innerHTML = '&nbsp;';
-    }
-
-    document.getElementById('dot').className = running ? 'live' : '';
-    document.getElementById('btn-label').textContent = running ? 'Stop' : 'Start';
-    document.getElementById('start-stop').className = running ? 'running' : '';
-
-    // Bottom summary — today's study + days done
-    document.getElementById('sum-study').textContent = fmt(secs);
-    document.getElementById('bar-study').style.width = Math.min(100, secs/GOAL*100) + '%';
-
-    let daysDone = 0;
-    for (let i = 0; i < DAYS_7; i++) {
-      const d = new Date(START_7); d.setDate(d.getDate() + i);
-      if (d.getTime() > todayMs) break;
-      if (getEntry(d).study >= GOAL) daysDone++;
-    }
-    document.getElementById('sum-days').textContent = daysDone + ' / 7';
-    document.getElementById('bar-days').style.width = (daysDone / DAYS_7 * 100) + '%';
-  }
-
-  function toggleTimer() {
-    if (!sessionStart) {
-      sessionStart = Date.now();
-      ticker = setInterval(() => { updateUI(); save(); }, 1000);
-      save();
-    } else {
-      const elapsed = Math.floor((Date.now()-sessionStart)/1000);
-      const d = todayData();
-      d.total = (d.total||0) + elapsed;
-      d.study = (d.study||0) + elapsed;
-      sessionStart = null;
-      clearInterval(ticker); ticker = null;
-      save();
-    }
-    updateUI();
-  }
-
-  window.addEventListener('beforeunload', save);
-
-  window.addEventListener('visibilitychange', () => {
-    if (document.hidden && sessionStart) {
-      const elapsed = Math.floor((Date.now()-sessionStart)/1000);
-      const d = todayData();
-      d.total = (d.total||0) + elapsed;
-      d.study = (d.study||0) + elapsed;
-      sessionStart = Date.now();
-      save();
-    }
-  });
-
-  // ── OVERLAY ──────────────────────────────────────────────
-
-  function openCal() {
-    document.getElementById('overlay').classList.add('open');
-    switchTab('7d');
-  }
-  function closeCal() {
-    document.getElementById('overlay').classList.remove('open');
-  }
-
-  function switchTab(tab) {
-    ['7d','30d','alltime','streak'].forEach(t => {
-      document.getElementById('tab-' + t).classList.toggle('visible', t === tab);
-      document.getElementById('tab-' + t + '-btn').classList.toggle('active', t === tab);
-    });
-    if (tab === '7d')         build7d();
-    else if (tab === '30d')   build30d();
-    else if (tab === 'streak') buildStreakTab();
-    else                       buildAllTime();
-  }
-
-  // ── 7-DAY TAB ────────────────────────────────────────────
-
-  function build7d() {
-    const todayMs = new Date(new Date().toDateString()).getTime();
-    let totalStudy = 0, daysDone = 0, daysActive = 0;
-    const roll7Start = new Date(todayMs); roll7Start.setDate(roll7Start.getDate() - 6);
-
-    for (let i = 0; i < DAYS_7; i++) {
-      const d = new Date(roll7Start); d.setDate(d.getDate() + i);
-      if (d.getTime() > todayMs) break;
-      const e = getEntry(d);
-      totalStudy += e.study;
-      if (e.study >= GOAL) daysDone++;
-      if (e.study > 0) daysActive++;
-    }
-
-    const avgH = daysActive > 0 ? (totalStudy / 3600 / daysActive).toFixed(1) : '—';
-
-    document.getElementById('stats-7d').innerHTML = `
-      <div class="stat-card"><div class="stat-val total">${Math.floor(totalStudy/3600)}h</div><div class="stat-lbl">Total</div></div>
-      <div class="stat-card"><div class="stat-val days">${daysDone} / ${DAYS_7}</div><div class="stat-lbl">Days Done</div></div>
-      <div class="stat-card"><div class="stat-val study">${avgH}h</div><div class="stat-lbl">Avg/Day</div></div>
-    `;
-
-    buildCal7d(todayMs);
-    build7dChart(todayMs);
-    buildDonut();
-  }
-
-  function buildCal7d(todayMs) {
-    const grid = document.getElementById('cal-7d');
-    grid.innerHTML = '';
-    const roll7Start = new Date(todayMs); roll7Start.setDate(roll7Start.getDate() - 6);
-    for (let i = 0; i < DAYS_7; i++) {
-      const d = new Date(roll7Start); d.setDate(d.getDate() + i);
-      const isToday  = d.getTime() === todayMs;
-      const isFuture = d.getTime() > todayMs;
-      const e = isFuture ? null : getEntry(d);
-      const done = e && e.study >= GOAL;
-
-      const el = document.createElement('div');
-      el.className = 'cal-day'
-        + (isToday  ? ' today'   : '')
-        + (done     ? ' done-day': '')
-        + (isFuture ? ' future'  : '');
-
-      const mon = document.createElement('div'); mon.className = 'cd-month';
-      mon.textContent = MONTHS[d.getMonth()]; el.appendChild(mon);
-
-      const num = document.createElement('div'); num.className = 'cd-num';
-      num.textContent = d.getDate(); el.appendChild(num);
-
-      if (!isFuture && e && e.study > 0) {
-        const t = document.createElement('div'); t.className = 'cd-total';
-        t.textContent = (e.study/3600).toFixed(1) + 'h'; el.appendChild(t);
-        if (done) { const c = document.createElement('div'); c.className = 'cd-check'; c.textContent = '✓'; el.appendChild(c); }
-      }
-      grid.appendChild(el);
-    }
-  }
-
-  function build7dChart(todayMs) {
-    const labels = [], studyData = [];
-    const roll7Start = new Date(todayMs); roll7Start.setDate(roll7Start.getDate() - 6);
-    for (let i = 0; i < DAYS_7; i++) {
-      const d = new Date(roll7Start); d.setDate(d.getDate() + i);
-      const mon = MONTHS[d.getMonth()];
-      labels.push(mon + ' ' + d.getDate());
-      if (d.getTime() > todayMs) {
-        studyData.push(null);
-      } else {
-        studyData.push(+(getEntry(d).study/3600).toFixed(2));
-      }
-    }
-
-    if (chart7d) { chart7d.destroy(); chart7d = null; }
-    chart7d = new Chart(document.getElementById('chart-7d').getContext('2d'), {
-      type: 'bar',
-      data: {
-        labels,
-        datasets: [{
-          label: 'Studying',
-          data: studyData,
-          backgroundColor: 'rgba(200,146,26,0.72)',
-          borderColor: 'rgba(200,146,26,0.9)',
-          borderWidth: 1,
-          borderRadius: 4,
-          borderSkipped: false,
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: ctx => {
-                const v = ctx.raw;
-                if (v == null) return '';
-                const h = Math.floor(v), m = Math.round((v-h)*60);
-                return ` ${h}h ${String(m).padStart(2,'0')}m`;
-              }
-            }
-          }
-        },
-        scales: {
-          x: { grid: { display: false }, ticks: { font: { size: 9, family: 'Jost, sans-serif' }, color: '#a89070', maxRotation: 0 }, border: { display: false } },
-          y: { min: 0, max: 12, grid: { color: '#f0ebe0' }, ticks: { font: { size: 8, family: 'Jost, sans-serif' }, color: '#a89070', stepSize: 2, callback: v => v + 'h' }, border: { display: false } }
-        }
-      }
-    });
-  }
-
-  function buildDonut() {
-    const ss = liveStudySecs();
-    const remaining = Math.max(0, GOAL - ss);
-    if (donutChart) { donutChart.destroy(); donutChart = null; }
-    donutChart = new Chart(document.getElementById('chart-donut').getContext('2d'), {
-      type: 'doughnut',
-      data: {
-        labels: ['Studying', 'Remaining'],
-        datasets: [{
-          data: [ss/3600, remaining/3600],
-          backgroundColor: ['rgba(200,146,26,0.85)', '#ede8df'],
-          borderWidth: 0,
-          hoverOffset: 4,
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: true, cutout: '70%',
-        plugins: {
-          legend: { position: 'bottom', labels: { font: { size: 10, family: 'Jost, sans-serif' }, color: '#6b5c44', padding: 14, usePointStyle: true, pointStyleWidth: 7, boxHeight: 7 } },
-          tooltip: { callbacks: { label: ctx => { const v=ctx.raw, h=Math.floor(v), m=Math.round((v-h)*60); return ` ${ctx.label}: ${h}h ${String(m).padStart(2,'0')}m`; } } }
-        }
-      }
-    });
-  }
-
-  // ── 30-DAY TAB (historical) ────────────────────────────
-
-  function build30d() {
-    const todayMs = new Date(new Date().toDateString()).getTime();
-    let totalStudy = 0, totalSabr = 0, daysDone = 0, daysActive = 0;
-    const roll30Start = new Date(todayMs); roll30Start.setDate(roll30Start.getDate() - 29);
-
-    for (let i = 0; i < DAYS_30; i++) {
-      const d = new Date(roll30Start); d.setDate(d.getDate() + i);
-      if (d.getTime() > todayMs) break;
-      const e = getEntry(d);
-      totalStudy += e.study;
-      totalSabr  += e.sabr;
-      if (e.total >= GOAL) daysDone++;
-      if (e.total > 0) daysActive++;
-    }
-
-    document.getElementById('stats-30d').innerHTML = `
-      <div class="stat-card"><div class="stat-val study">${Math.floor(totalStudy/3600)}h</div><div class="stat-lbl">Studying</div></div>
-      <div class="stat-card"><div class="stat-val sabr">${Math.floor(totalSabr/3600)}h</div><div class="stat-lbl">SABR</div></div>
-      <div class="stat-card"><div class="stat-val total">${Math.floor((totalStudy+totalSabr)/3600)}h</div><div class="stat-lbl">Total</div></div>
-      <div class="stat-card"><div class="stat-val days">${daysDone}/${DAYS_30}</div><div class="stat-lbl">Days Done</div></div>
-    `;
-
-    buildCal30d(todayMs);
-  }
-
-  function buildCal30d(todayMs) {
-    const grid = document.getElementById('cal-30d');
-    grid.innerHTML = '';
-    const roll30Start = new Date(todayMs); roll30Start.setDate(roll30Start.getDate() - 29);
-
-    ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d => {
-      const el = document.createElement('div'); el.className = 'dn'; el.textContent = d; grid.appendChild(el);
-    });
-
-    for (let i = 0; i < roll30Start.getDay(); i++) {
-      const el = document.createElement('div'); el.className = 'cal-day empty'; grid.appendChild(el);
-    }
-
-    for (let i = 0; i < DAYS_30; i++) {
-      const d = new Date(roll30Start); d.setDate(d.getDate() + i);
-      const isToday  = d.getTime() === todayMs;
-      const isFuture = d.getTime() > todayMs;
-      const e = isFuture ? null : getEntry(d);
-      const tot  = e ? e.total : 0;
-      const stud = e ? e.study : 0;
-      const sabr = e ? e.sabr  : 0;
-      const done = tot >= GOAL;
-
-      const el = document.createElement('div');
-      el.className = 'cal-day'
-        + (isToday  ? ' today'   : '')
-        + (done     ? ' done-day': '')
-        + (isFuture ? ' future'  : '');
-
-      const n = document.createElement('div'); n.className = 'cd-num'; n.textContent = d.getDate(); el.appendChild(n);
-
-      if (!isFuture && tot > 0) {
-        const t = document.createElement('div'); t.className = 'cd-total';
-        t.textContent = (tot/3600).toFixed(1) + 'h'; el.appendChild(t);
-
-        if (stud > 0 || sabr > 0) {
-          const sp = document.createElement('div'); sp.className = 'cd-split';
-          if (stud > 0) { const s = document.createElement('div'); s.className='cd-type s'; s.textContent='S '+(stud/3600).toFixed(1)+'h'; sp.appendChild(s); }
-          if (sabr > 0) { const r = document.createElement('div'); r.className='cd-type r'; r.textContent='R '+(sabr/3600).toFixed(1)+'h'; sp.appendChild(r); }
-          el.appendChild(sp);
-        }
-        if (done) { const c = document.createElement('div'); c.className='cd-check'; c.textContent='✓'; el.appendChild(c); }
-      }
-      grid.appendChild(el);
-    }
-  }
-
-  // ── ALL TIME TAB ──────────────────────────────────────────
-
-  function buildAllTime() {
-    const todayMs = new Date(new Date().toDateString()).getTime();
-
-    // Collect all keyed dates from state and also walk both challenge windows
-    let totalStudy = 0, totalSabr = 0, daysActive = 0;
-    const allDays = new Set();
-
-    // Add all days from both challenge windows
-    for (let i = 0; i < DAYS_30; i++) {
-      const d = new Date(START_30); d.setDate(d.getDate() + i);
-      allDays.add(dateKey(d));
-    }
-    for (let i = 0; i < DAYS_7; i++) {
-      const d = new Date(START_7); d.setDate(d.getDate() + i);
-      allDays.add(dateKey(d));
-    }
-    // Also include any logged keys outside those windows
-    Object.keys(state).forEach(k => allDays.add(k));
-
-    allDays.forEach(k => {
-      const entry = state[k];
-      if (!entry) return;
-      // For today, add live session
-      const [y,mo,day] = k.split('-').map(Number);
-      const dMs = new Date(y, mo-1, day).getTime();
-      if (dMs > todayMs) return;
-      let stud = entry.study || 0;
-      let sabr = entry.sabr  || 0;
-      if (k === todayKey() && sessionStart) stud += Math.floor((Date.now()-sessionStart)/1000);
-      if (stud > 0 || sabr > 0) daysActive++;
-      totalStudy += stud;
-      totalSabr  += sabr;
-    });
-
-    const grandTotal = totalStudy + totalSabr;
-    document.getElementById('stats-alltime').innerHTML = `
-      <div class="stat-card"><div class="stat-val total">${Math.floor(grandTotal/3600)}h</div><div class="stat-lbl">Grand Total</div></div>
-      <div class="stat-card"><div class="stat-val study">${Math.floor(totalStudy/3600)}h</div><div class="stat-lbl">Studying</div></div>
-      <div class="stat-card"><div class="stat-val sabr">${Math.floor(totalSabr/3600)}h</div><div class="stat-lbl">SABR</div></div>
-      <div class="stat-card"><div class="stat-val days">${daysActive}</div><div class="stat-lbl">Days Active</div></div>
-    `;
-
-    buildAllTimeChart(todayMs);
-  }
-
-  function buildAllTimeChart(todayMs) {
-    // Show all days from START_30 through end of 7-day challenge (or today)
-    const END_7 = new Date(START_7); END_7.setDate(END_7.getDate() + DAYS_7 - 1);
-    const chartEnd = Math.min(END_7.getTime(), todayMs);
-
-    const labels = [], studyData = [], sabrData = [];
-    const cursor = new Date(START_30);
-
-    while (cursor.getTime() <= chartEnd + 86400000) {
-      const k = dateKey(cursor);
-      const dMs = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate()).getTime();
-      if (dMs > chartEnd) break;
-
-      labels.push(MONTHS[cursor.getMonth()] + ' ' + cursor.getDate());
-      const entry = state[k];
-      let stud = entry ? (entry.study || 0) : 0;
-      let sabr = entry ? (entry.sabr  || 0) : 0;
-      if (k === todayKey() && sessionStart) stud += Math.floor((Date.now()-sessionStart)/1000);
-      studyData.push(+(stud/3600).toFixed(2));
-      sabrData.push(+(sabr/3600).toFixed(2));
-
-      cursor.setDate(cursor.getDate() + 1);
-    }
-
-    if (alltimeChart) { alltimeChart.destroy(); alltimeChart = null; }
-    alltimeChart = new Chart(document.getElementById('chart-alltime').getContext('2d'), {
-      type: 'bar',
-      data: {
-        labels,
-        datasets: [
-          {
-            label: 'Studying',
-            data: studyData,
-            backgroundColor: 'rgba(200,146,26,0.72)',
-            borderColor: 'rgba(200,146,26,0.9)',
-            borderWidth: 1,
-            borderRadius: 3,
-            borderSkipped: false,
-          },
-          {
-            label: 'SABR',
-            data: sabrData,
-            backgroundColor: 'rgba(58,138,88,0.72)',
-            borderColor: 'rgba(58,138,88,0.9)',
-            borderWidth: 1,
-            borderRadius: 3,
-            borderSkipped: false,
-          }
-        ]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: ctx => {
-                const v = ctx.raw;
-                if (!v) return '';
-                const h = Math.floor(v), m = Math.round((v-h)*60);
-                return ` ${ctx.dataset.label}: ${h}h ${String(m).padStart(2,'0')}m`;
-              }
-            }
-          }
-        },
-        scales: {
-          x: {
-            stacked: true,
-            grid: { display: false },
-            ticks: { font: { size: 7, family: 'Jost, sans-serif' }, color: '#a89070', maxRotation: 45, autoSkip: true, maxTicksLimit: 14 },
-            border: { display: false },
-          },
-          y: {
-            stacked: true,
-            min: 0, max: 12,
-            grid: { color: '#f0ebe0' },
-            ticks: { font: { size: 8, family: 'Jost, sans-serif' }, color: '#a89070', stepSize: 2, callback: v => v + 'h' },
-            border: { display: false },
-          }
-        }
-      }
-    });
-  }
-
-  // ── STREAK ───────────────────────────────────────────────
-
-  function loadStreak() {
-    try { return JSON.parse(localStorage.getItem('nofap_streak') || 'null'); } catch(e) { return null; }
-  }
-  function saveStreak(data) {
-    localStorage.setItem('nofap_streak', JSON.stringify(data));
-  }
-
-  function streakDays(startISO) {
-    const start = new Date(new Date(startISO).toDateString());
-    const today = new Date(new Date().toDateString());
-    return Math.floor((today - start) / 86400000);
-  }
-
-  function fmtDate(iso) {
-    const d = new Date(iso);
-    return MONTHS[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
-  }
-
-  function updateStreakUI() {
-    const data = loadStreak();
-    const countEl = document.getElementById('streak-count');
-    const sinceEl = document.getElementById('streak-since');
-    if (!data || !data.start) {
-      countEl.textContent = '0 days';
-      sinceEl.textContent = 'not started';
-      return;
-    }
-    const days = streakDays(data.start);
-    countEl.textContent = days === 1 ? '1 day' : days + ' days';
-    sinceEl.textContent = 'since ' + fmtDate(data.start);
-  }
-
-  function buildStreakTab() {
-    const data = loadStreak() || { start: new Date().toISOString(), resets: [] };
-    const resets = data.resets || [];
-    const days = streakDays(data.start);
-
-    document.getElementById('streak-tab-count').textContent = days === 1 ? '1 day' : days + ' days';
-    document.getElementById('streak-tab-since').textContent = 'since ' + fmtDate(data.start);
-    document.getElementById('streak-tab-resets').textContent = resets.length;
-
-    const list = document.getElementById('streak-history-list');
-    if (resets.length === 0) {
-      list.innerHTML = '<div style="font-size:12px;color:var(--text-3);padding:0.5rem 0;">No resets yet. Keep going.</div>';
-    } else {
-      list.innerHTML = resets.slice().reverse().map((r, i) => {
-        const d = new Date(r);
-        const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        return `
-        <div class="reset-row">
-          <span>${fmtDate(r)} <span style="color:var(--text-3);font-size:11px;">${time}</span></span>
-          <span class="reset-num">Reset #${resets.length - i}</span>
-        </div>`;
-      }).join('');
-    }
-  }
-
-  function resetStreak() {
-    if (!confirm('Reset your streak? This marks today as day 0.')) return;
-    const data = loadStreak() || { start: new Date().toISOString(), resets: [] };
-    if (!data.resets) data.resets = [];
-    data.resets.push(new Date().toISOString());
-    data.start = new Date().toISOString();
-    saveStreak(data);
-    updateStreakUI();
-    buildStreakTab();
-  }
-
-  // Start streak if never set
-  if (!loadStreak()) saveStreak({ start: new Date().toISOString(), resets: [] });
-
-  // ── INIT ─────────────────────────────────────────────────
-  updateUI();
-  updateStreakUI();
-</script>
+<script src="app.js"></script>
 </body>
 </html>
