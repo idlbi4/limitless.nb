@@ -1,0 +1,14 @@
+{
+  "name": "30-day-challenge-tracker",
+  "version": "1.0.0",
+  "description": "30-Day Challenge Tracker",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-packager . '30-Day Challenge Tracker' --platform=darwin --arch=arm64 --icon=icon.icns --overwrite --out=dist --ignore=dist"
+  },
+  "devDependencies": {
+    "electron": "^29.0.0",
+    "electron-packager": "^17.1.2"
+  }
+}
