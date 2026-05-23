@@ -1093,12 +1093,12 @@
     const countEl = document.getElementById('streak-count');
     const sinceEl = document.getElementById('streak-since');
     if (!data || !data.start) {
-      countEl.textContent = '0 dayss';
+      countEl.textContent = '0 days';
       sinceEl.textContent = 'not started';
       return;
     }
     const days = streakDays(data.start);
-    countEl.textContent = days === 1 ? '1 day' : days + ' dayss';
+    countEl.textContent = days === 1 ? '1 day' : days + ' days';
     sinceEl.textContent = 'since ' + fmtDate(data.start);
   }
 
