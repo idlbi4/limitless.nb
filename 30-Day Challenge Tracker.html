@@ -735,9 +735,10 @@
   function build7d() {
     const todayMs = new Date(new Date().toDateString()).getTime();
     let totalStudy = 0, daysDone = 0, daysActive = 0;
+    const roll7Start = new Date(todayMs); roll7Start.setDate(roll7Start.getDate() - 6);
 
     for (let i = 0; i < DAYS_7; i++) {
-      const d = new Date(START_7); d.setDate(d.getDate() + i);
+      const d = new Date(roll7Start); d.setDate(d.getDate() + i);
       if (d.getTime() > todayMs) break;
       const e = getEntry(d);
       totalStudy += e.study;
@@ -761,8 +762,9 @@
   function buildCal7d(todayMs) {
     const grid = document.getElementById('cal-7d');
     grid.innerHTML = '';
+    const roll7Start = new Date(todayMs); roll7Start.setDate(roll7Start.getDate() - 6);
     for (let i = 0; i < DAYS_7; i++) {
-      const d = new Date(START_7); d.setDate(d.getDate() + i);
+      const d = new Date(roll7Start); d.setDate(d.getDate() + i);
       const isToday  = d.getTime() === todayMs;
       const isFuture = d.getTime() > todayMs;
       const e = isFuture ? null : getEntry(d);
@@ -791,8 +793,9 @@
 
   function build7dChart(todayMs) {
     const labels = [], studyData = [];
+    const roll7Start = new Date(todayMs); roll7Start.setDate(roll7Start.getDate() - 6);
     for (let i = 0; i < DAYS_7; i++) {
-      const d = new Date(START_7); d.setDate(d.getDate() + i);
+      const d = new Date(roll7Start); d.setDate(d.getDate() + i);
       const mon = MONTHS[d.getMonth()];
       labels.push(mon + ' ' + d.getDate());
       if (d.getTime() > todayMs) {
@@ -870,9 +873,10 @@
   function build30d() {
     const todayMs = new Date(new Date().toDateString()).getTime();
     let totalStudy = 0, totalSabr = 0, daysDone = 0, daysActive = 0;
+    const roll30Start = new Date(todayMs); roll30Start.setDate(roll30Start.getDate() - 29);
 
     for (let i = 0; i < DAYS_30; i++) {
-      const d = new Date(START_30); d.setDate(d.getDate() + i);
+      const d = new Date(roll30Start); d.setDate(d.getDate() + i);
       if (d.getTime() > todayMs) break;
       const e = getEntry(d);
       totalStudy += e.study;
@@ -894,17 +898,18 @@
   function buildCal30d(todayMs) {
     const grid = document.getElementById('cal-30d');
     grid.innerHTML = '';
+    const roll30Start = new Date(todayMs); roll30Start.setDate(roll30Start.getDate() - 29);
 
     ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d => {
       const el = document.createElement('div'); el.className = 'dn'; el.textContent = d; grid.appendChild(el);
     });
 
-    for (let i = 0; i < START_30.getDay(); i++) {
+    for (let i = 0; i < roll30Start.getDay(); i++) {
       const el = document.createElement('div'); el.className = 'cal-day empty'; grid.appendChild(el);
     }
 
     for (let i = 0; i < DAYS_30; i++) {
-      const d = new Date(START_30); d.setDate(d.getDate() + i);
+      const d = new Date(roll30Start); d.setDate(d.getDate() + i);
       const isToday  = d.getTime() === todayMs;
       const isFuture = d.getTime() > todayMs;
       const e = isFuture ? null : getEntry(d);
